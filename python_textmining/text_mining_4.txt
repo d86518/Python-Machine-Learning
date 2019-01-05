@@ -1,0 +1,22 @@
+在define一個有更好performance的新表示法前，
+我認為需要先說明 BOW 和 Word embeddings 之缺點。
+
+先以BOW來說，當每篇文章的總字數不一樣，可能影響取得的結果。
+Ex:doc_1 中出現 word_1 10次;doc_2 中出現 word_1 2次
+以比例來說我們會認為代表word_1對文件doc_1比較重要，但答案是否定的，說不定doc_1有10000個字
+，而doc_2只有50個字，如此一來word_1應該對doc_2比較重要才對。
+
+接著是Word Embedding，使用的representation 為 one-hot，以出現頻率為它的weight
+那如果我們採用的文件裡面data量很大，表示它向量的dimension很高，產生的matrix也會是稀疏矩陣
+不僅如此，任意兩個詞之間獨立性也會變高、correlation下降，以效率來說就會很差
+
+總結以上兩者來說，均是以詞的frequency做為評估建立我們後面比對用的dictionary，
+凡是詞出現越多，我們就認為它可能對於我們的文本來說較重要，
+那得出來的結果重要性較高的為stop word機率也會很高。
+
+那我自己的representation method我會嘗試這樣設計
+
+假設文件為doc,doc1,doc2...
+先對doc做remove_stopwords() => stopword不該計算進去
+接著定義我們dictionary大小為top前幾 => 避免矩陣太大且為Sparse，造成space上的complexity太高，避免Word Embedding的問題
+最後以doc的amount做分母，以比率來看重要性避免BOW出現的問題
